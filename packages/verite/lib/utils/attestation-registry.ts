@@ -4,6 +4,7 @@ const VERITE_SCHEMAS_PREFIX_URI = "https://verite.id/definitions/schemas/0.0.1"
 const VERITE_PROCESSES_PREFIX_URI = "https://verite.id/definitions/processes"
 
 // Known Attestations
+export const ID_ATTESTATION = "IdAttestation"
 export const KYCAML_ATTESTATION = "KYCAMLAttestation"
 export const KYBPAML_ATTESTATION = "KYBPAMLAttestation"
 export const CREDIT_SCORE_ATTESTATION = "CreditScoreAttestation"

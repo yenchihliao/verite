@@ -12,6 +12,7 @@ import {
 export const CREDENTIAL_SCHEMA_PROPERTY_NAME = "credentialSchema"
 export const CREDENTIAL_SUBJECT_PROPERTY_NAME = "credentialSubject"
 export const HOLDER_PROPERTY_NAME = "holder"
+export const IDENTITY_PROPERTY_NAME = "identity"
 export const ID_PROPERTY_NAME = "id"
 export const EDDSA = "EdDSA"
 

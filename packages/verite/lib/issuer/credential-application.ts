@@ -9,6 +9,7 @@ import {
   CredentialManifest,
   DecodedCredentialApplication,
   DescriptorMap,
+  InputDescriptorConstraintField,
   DidKey,
   EncodedCredentialApplication
 } from "../../types"
@@ -21,6 +22,7 @@ import {
   VERIFIABLE_PRESENTATION_TYPE_NAME
 } from "../utils"
 
+import type { JWT } from "did-jwt-vc/src/types"
 /**
  * Generates a Credential Application as response to a Credential Manifest
  *
@@ -30,7 +32,7 @@ export async function buildCredentialApplication(
   didKey: DidKey,
   manifest: CredentialManifest,
   options?: CreatePresentationOptions
-): Promise<EncodedCredentialApplication> {
+): Promise<JWT> {
   const client = buildIssuer(didKey.subject, didKey.privateKey)
 
   let presentationSubmission
@@ -74,6 +76,59 @@ export async function buildCredentialApplication(
   return vp
 }
 
+export async function buildIdCredentialApplication(
+  didKey: DidKey,
+  manifest: CredentialManifest,
+  PID: string,
+  options?: CreatePresentationOptions
+): Promise<JWT> {
+  const client = buildIssuer(didKey.subject, didKey.privateKey)
+
+  let presentationSubmission
+  if (manifest.presentation_definition) {
+    presentationSubmission = {
+      id: uuidv4(),
+      definition_id: manifest.presentation_definition?.id,
+      descriptor_map:
+        manifest.presentation_definition?.input_descriptors?.map<DescriptorMap>(
+          (d) => {
+            return {
+              id: d.id,
+              format: ClaimFormat.JwtVp,
+              path: `${d.constraints?.fields?.map<string>(
+                (f) => {
+                  return f.path[0]
+                }
+              )}`
+            }
+          }
+        )
+    }
+  }
+
+  const credentialApplication = {
+    id: uuidv4(),
+    manifest_id: manifest.id,
+    format: {
+      jwt_vp: manifest.presentation_definition?.format?.jwt_vp
+    },
+    presentation_submission: presentationSubmission
+  }
+
+  const vp = await encodeVerifiablePresentation(
+    client.did, // subject
+    undefined, // VC[]
+    client, // issuer
+    options, // options?
+    [VERIFIABLE_PRESENTATION_TYPE_NAME, CREDENTIAL_APPLICATION_TYPE_NAME], // type?
+    {
+      identity: PID,
+      credential_application: credentialApplication
+    } // extra
+  )
+
+  return vp
+}
 /**
  * Decode an encoded Credential Application.
  *

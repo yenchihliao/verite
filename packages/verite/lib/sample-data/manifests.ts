@@ -7,6 +7,7 @@ import {
 import {
   buildManifest,
   HOLDER_PROPERTY_NAME,
+  IDENTITY_PROPERTY_NAME,
   JWT_VP_CLAIM_FORMAT_DESIGNATION,
   OutputDescriptorBuilder,
   PresentationDefinitionBuilder
@@ -14,11 +15,13 @@ import {
 import {
   CREDIT_SCORE_ATTESTATION,
   getAttestionDefinition,
-  KYCAML_ATTESTATION
+  KYCAML_ATTESTATION,
+  ID_ATTESTATION
 } from "../utils/attestation-registry"
 import {
   PROOF_OF_CONTROL_PRESENTATION_DEF_ID_TYPE_NAME,
   KYCAML_CREDENTIAL_TYPE_NAME,
+  ID_CREDENTIAL_TYPE_NAME,
   CREDIT_SCORE_CREDENTIAL_TYPE_NAME,
   CREDIT_SCORE_MANIFEST_ID,
   KYCAML_MANIFEST_ID
@@ -38,6 +41,42 @@ export function proofOfControlPresentationDefinition(): PresentationDefinition {
             f.id(HOLDER_PROPERTY_NAME)
             f.path([`$.${HOLDER_PROPERTY_NAME}`]).purpose(
               "The VP should contain a DID in the holder, which is the same DID that signs the VP. This DID will be used as the subject of the issued VC"
+            )
+          })
+        })
+    })
+    .build()
+
+  return p
+}
+
+export function proofOfIdentityPresentationDefinition(): PresentationDefinition {
+  const p = new PresentationDefinitionBuilder({
+    id: PROOF_OF_CONTROL_PRESENTATION_DEF_ID_TYPE_NAME
+  })
+    .format(JWT_VP_CLAIM_FORMAT_DESIGNATION)
+    .addInputDescriptor("proofOfIdentifierControlVP", (b) => {
+      b.name("Proof of Control Verifiable Presentation")
+        .purpose("A VP establishing proof of identifier control over the DID.")
+        .format(JWT_VP_CLAIM_FORMAT_DESIGNATION)
+        .withConstraints((c) => {
+          c.addField((f) => {
+            f.id(HOLDER_PROPERTY_NAME)
+            f.path([`$.${HOLDER_PROPERTY_NAME}`]).purpose(
+              "The VP should contain a DID in the holder, which is the same DID that signs the VP. This DID will be used as the subject of the issued VC"
+            )
+          })
+        })
+    })
+    .addInputDescriptor("proofOfIdentifierControlPersonalIdentity", (b) => {
+      b.name("Proof of Control Verifiable Presentation")
+        .purpose("A VP establishing proof of identifier control over the personal identity.")
+        .format(JWT_VP_CLAIM_FORMAT_DESIGNATION)
+        .withConstraints((c) => {
+          c.addField((f) => {
+            f.id(IDENTITY_PROPERTY_NAME)
+            f.path([`$.${IDENTITY_PROPERTY_NAME}`]).purpose(
+              "The VP should contain personal identity number."
             )
           })
         })
@@ -101,6 +140,51 @@ export function buildKycAmlManifest(
     issuer,
     [outputDescriptor],
     proofOfControlPresentationDefinition()
+  )
+}
+
+export function buildIdManifest(
+  issuer: CredentialIssuer,
+  styles: EntityStyle = {}
+): CredentialManifest {
+  // const attestationInfo = getAttestionDefinition(KYCAML_ATTESTATION)
+
+  const outputDescriptor = new OutputDescriptorBuilder()
+    .id(`${ID_CREDENTIAL_TYPE_NAME}`)
+    // .schema(attestationInfo.schema)
+    .schema("https://verite.id/definitions/schemas/0.0.1/IdAttestation")
+    .name(`Proof of Id from ${issuer.name}`)
+    .description(
+      `Attestation that ${issuer.name} has completed Id verification for this subject`
+    )
+    .styles(styles)
+    .withDisplay(`${issuer.name} Id Attestation`, (d) => {
+      d.title(`${issuer.name} Id Attestation`)
+        .subtitle({
+          path: ["$.approvalDate", "$.vc.approvalDate"],
+          fallback: "Includes date of approval"
+        })
+        .description(
+          "The Taisys demo for knowing the id"
+          // "The KYC authority processes Know Your Customer and Anti-Money Laundering analysis, potentially employing a number of internal and external vendor providers."
+        )
+        .addStringProperty("Identity", (p) =>
+          p.path([`$.${ID_ATTESTATION}.identity`])
+        )
+        .addStringProperty("Process", (p) =>
+          p.path([`$.${ID_ATTESTATION}.process`])
+        )
+        .addDateTimeProperty("Approved At", (p) =>
+          p.path([`$.${ID_ATTESTATION}.approvalDate`])
+        )
+    })
+    .build()
+
+  return buildManifest(
+    ID_ATTESTATION,
+    issuer,
+    [outputDescriptor],
+    proofOfIdentityPresentationDefinition()
   )
 }
 

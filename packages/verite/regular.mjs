@@ -3,7 +3,9 @@ import {
   buildIssuer,
   buildAndSignFulfillment,
   buildKycAmlManifest,
+  buildIdManifest,
   buildCredentialApplication,
+  buildIdCredentialApplication,
   buildKycVerificationOffer,
   buildPresentationSubmission,
   validateVerificationSubmission,
@@ -33,21 +35,22 @@ if(conti){
 
 //  Issuer builds a manifest representing the type of credential (in this case a KYCAML credential)
 const issuer = buildIssuer(issuerDidKey.subject, issuerDidKey.privateKey)
-const manifest = buildKycAmlManifest({ id: issuer.did, name: "Taisys" })
+const manifest = buildIdManifest({ id: issuer.did, name: "Taisys" })
 var conti = prompt()('manifest: ')
 if(conti) {
   console.log(util.inspect(manifest, false, null))
 }
 
+// const option = {"identity": "A123456789"}
 //  The credential application is created and returned as a JWT
-const encodedApplication = await buildCredentialApplication(clientDidKey, manifest)
+const encodedApplication = await buildIdCredentialApplication(clientDidKey, manifest, "A123456789")
 // console.log(application)
 
 //  The decoded JWT is necessary when it comes time to issue the verifiable presentation which will include this credential
 const application = await decodeVerifiablePresentation(encodedApplication)
-await validateCredentialApplication(application, manifest)
 var conti = prompt()('application: ')
 if(conti) console.log(util.inspect(application, false, null))
+await validateCredentialApplication(application, manifest)
 
 //  The issuer is created from the issuer key, and the credential is issued
 var conti = prompt()('issuer: ')

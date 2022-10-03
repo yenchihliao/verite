@@ -1,6 +1,7 @@
 // Credential Types
 export const CREDIT_SCORE_CREDENTIAL_TYPE_NAME = "CreditScoreCredential"
 export const KYCAML_CREDENTIAL_TYPE_NAME = "KYCAMLCredential"
+export const ID_CREDENTIAL_TYPE_NAME = "IdCredential"
 
 export const PROOF_OF_CONTROL_PRESENTATION_DEF_ID_TYPE_NAME =
   "ProofOfControlPresentationDefinition"

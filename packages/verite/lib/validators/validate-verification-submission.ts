@@ -1,4 +1,5 @@
 import Ajv from "ajv"
+import util from 'util'
 import jsonpath from "jsonpath"
 
 import { ValidationError } from "../errors"
@@ -30,7 +31,9 @@ function findFirstMatchingPathForField(
   field: InputDescriptorConstraintField,
   credential: Verifiable<W3CCredential>
 ): unknown | undefined {
+  console.log(util.inspect(field, false, null))
   for (const path of field.path) {
+    console.log(path)
     const value = jsonpath.query(credential, path)
     if (value.length) {
       return value[0]
@@ -64,10 +67,12 @@ function validateField(
  * Validate all input descriptors against their constraints in the
  * verification request presentation definition
  */
-function validateInputDescriptors(
+export function validateInputDescriptors(
   credentialMap: Map<string, Verifiable<W3CCredential>[]>,
   descriptors?: InputDescriptor[]
 ): void {
+  console.log("credentialMap: ", util.inspect(credentialMap, false, null))
+  console.log("descriptor:  ", util.inspect(descriptors, false, null))
   if (!descriptors) {
     // no input descriptors, so there is nothing to validate
     return
@@ -75,6 +80,7 @@ function validateInputDescriptors(
 
   // iterate over all input descriptors to find the relevant credentials
   descriptors.forEach((descriptor) => {
+    console.log("validating: ", descriptor)
     const constraints = descriptor.constraints
     const fields = constraints?.fields
 
@@ -84,6 +90,7 @@ function validateInputDescriptors(
     }
 
     const credentials = credentialMap.get(descriptor.id)
+    console.log(credentials)
 
     if (!credentials || !credentials.length) {
       // no credentials found for this schema, nothing to validate
@@ -115,7 +122,10 @@ function mapInputsToDescriptors(
 ): Map<string, Verifiable<W3CCredential>[]> {
   const descriptorMap = submission.presentation_submission?.descriptor_map ?? []
 
+  // console.log(util.inspect(definition, false, null))
+  // console.log(util.inspect(descriptorMap, false, null))
   return descriptorMap.reduce((map, d) => {
+    // console.log(d.id)
     const match = definition?.input_descriptors.find((id) => id.id === d.id)
 
     if (!match) {
@@ -123,6 +133,7 @@ function mapInputsToDescriptors(
     }
 
     const credentials = jsonpath.query(submission, d.path)
+    console.log("setting: ", match.id, credentials)
     return map.set(match.id, credentials)
   }, new Map<string, Verifiable<W3CCredential>[]>())
 }
@@ -273,6 +284,7 @@ export async function validateVerificationSubmission(
   ensureNotExpired(presentation)
 
   const credentialMap = mapInputsToDescriptors(presentation, definition)
+  console.log(util.inspect(credentialMap, false, null))
   /**
    * Check that the Verified Presentation was signed by the subject of the
    * Verified Credential. This ensures that the person submitting the

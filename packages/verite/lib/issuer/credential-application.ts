@@ -97,7 +97,8 @@ export async function buildIdCredentialApplication(
               format: ClaimFormat.JwtVp,
               path: `${d.constraints?.fields?.map<string>(
                 (f) => {
-                  return f.path[0]
+                  // return f.path[0]
+                  return '$'
                 }
               )}`
             }

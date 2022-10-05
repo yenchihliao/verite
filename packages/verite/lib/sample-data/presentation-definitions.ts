@@ -13,12 +13,15 @@ import {
 import {
   AttestationDefinition,
   CREDIT_SCORE_ATTESTATION,
+  ID_ATTESTATION,
   getAttestionDefinition,
   KYCAML_ATTESTATION
 } from "../utils/attestation-registry"
 import {
   CREDIT_SCORE_CREDENTIAL_TYPE_NAME,
   CREDIT_SCORE_PRESENTATION_DEFINITION_TYPE_NAME,
+  ID_CREDENTIAL_TYPE_NAME,
+  ID_PRESENTATION_DEFINITION_TYPE_NAME,
   KYCAML_CREDENTIAL_TYPE_NAME,
   KYCAML_PRESENTATION_DEFINITION_TYPE_NAME
 } from "./constants"
@@ -101,6 +104,29 @@ export function creditScorePresentationDefinition(
     .build()
   return {
     id: CREDIT_SCORE_PRESENTATION_DEFINITION_TYPE_NAME,
+    input_descriptors: [inputDescriptor]
+  }
+}
+
+export function IdPresentationDefinition(
+  trustedAuthorities: string[] = []
+): PresentationDefinition {
+  const attestationInfo = getAttestionDefinition(ID_ATTESTATION)
+  const pathPrefixConvention = `${ID_ATTESTATION}.`
+
+  const constraintsBuilder = new InputDescriptorConstraintsBuilder()
+    .addField(stringValueConstraint("process", pathPrefixConvention))
+    .addField(stringValueConstraint("approvalDate", pathPrefixConvention))
+
+  const inputDescriptor = new InputDescriptorBuilder()
+    .id(ID_CREDENTIAL_TYPE_NAME)
+    .name("Proof of Personal Id")
+    .purpose("Please provide a valid credential from a Personal Id issuer")
+    .constraints(constraintsBuilder.build())
+    .withConstraints(withDefaults(attestationInfo.schema, trustedAuthorities))
+    .build()
+  return {
+    id: ID_PRESENTATION_DEFINITION_TYPE_NAME,
     input_descriptors: [inputDescriptor]
   }
 }

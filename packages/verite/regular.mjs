@@ -7,6 +7,7 @@ import {
   buildCredentialApplication,
   buildIdCredentialApplication,
   buildKycVerificationOffer,
+  buildIdVerificationOffer,
   buildPresentationSubmission,
   validateVerificationSubmission,
   validateCredentialApplication,
@@ -58,21 +59,21 @@ if(conti) console.log(util.inspect(issuer, false, null))
 
 //  The attestation is a standardized representation of the issuer
 const attestation = {
-  type: "KYCAMLAttestation",
-  process: "https://verite.id/definitions/processes/kycaml/0.0.1/usa",
+  type: "IdAttestation",
+  process: "https://verite.id/definitions/processes/id/0.0.1/usa",
   approvalDate: new Date().toISOString()
 }
 const fulfillment = await buildAndSignFulfillment(
-  issuer,
-  clientDidKey.subject,
-  manifest,
-  attestation,
-   "KYCAMLCredential",
+  issuer, // signer
+  clientDidKey.subject, // subject
+  manifest, // manifest
+  attestation, // attestation
+   "IdCredential", // credential type
   {
     // credentialSchema: getCredentialSchemaAsVCObject(getAttestionDefinition(KYCAML_ATTESTATION)),
     credentialSchema: {
-      id: "https://verite.id/definitions/schemas/0.0.1/KYCAMLAttestation",
-      type: "KYCAMLCredential",
+      id: "https://verite.id/definitions/schemas/0.0.1/IdAttestation",
+      type: "IdCredential",
     },
     credentialStatus: {
       id: "http://example.com/revocation-list#42",
@@ -103,7 +104,7 @@ const vc = await decodeVerifiableCredential(encodedVc.proof.jwt)
 
 //  The subject would make a request to the verifier's server to obtain the verification
 //  offer. The code below must be executed by the verifier, using the verifier's key.
-const offer = buildKycVerificationOffer(
+const offer = buildIdVerificationOffer(
   uuidv4(),
   verifierDidKey.subject,
   "https://test.host/verify",

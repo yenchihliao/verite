@@ -33,6 +33,13 @@ export type AttestationDefinition = {
 
 const allAttestations = new Map<string, AttestationDefinition>([
   [
+    ID_ATTESTATION,
+    instantiate(
+      ID_ATTESTATION,
+      `${VERITE_PROCESSES_PREFIX_URI}/id/0.0.1/usa`
+    )
+  ],
+  [
     KYCAML_ATTESTATION,
     instantiate(
       KYCAML_ATTESTATION,

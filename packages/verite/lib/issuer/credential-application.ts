@@ -46,7 +46,12 @@ export async function buildCredentialApplication(
             return {
               id: d.id,
               format: ClaimFormat.JwtVp,
-              path: `$.${HOLDER_PROPERTY_NAME}`
+              path: `${d.constraints?.fields?.map<string>(
+                (f) => {
+                  // return f.path[0]
+                  return '$'
+                }
+              )}`
             }
           }
         )

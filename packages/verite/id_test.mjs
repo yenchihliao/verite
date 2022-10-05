@@ -2,18 +2,14 @@ import {
   randomDidKey,
   buildIssuer,
   buildAndSignFulfillment,
-  buildKycAmlManifest,
   buildIdManifest,
-  buildCredentialApplication,
   buildIdCredentialApplication,
-  buildKycVerificationOffer,
   buildIdVerificationOffer,
   buildPresentationSubmission,
   validateVerificationSubmission,
   validateCredentialApplication,
   decodeVerifiableCredential,
   decodeVerifiablePresentation,
-  getSampleKycAmlAttestation,
   getCredentialSchemaAsVCObject,
   getAttestionDefinition
 } from "verite"
@@ -34,7 +30,7 @@ if(conti){
   console.log(verifierDidKey['id'])
 }
 
-//  Issuer builds a manifest representing the type of credential (in this case a KYCAML credential)
+//  Issuer builds a manifest representing the type of credential (in this case a Id credential)
 const issuer = buildIssuer(issuerDidKey.subject, issuerDidKey.privateKey)
 const manifest = buildIdManifest({ id: issuer.did, name: "Taisys" })
 var conti = prompt()('manifest: ')
@@ -42,7 +38,6 @@ if(conti) {
   console.log(util.inspect(manifest, false, null))
 }
 
-// const option = {"identity": "A123456789"}
 //  The credential application is created and returned as a JWT
 const encodedApplication = await buildIdCredentialApplication(clientDidKey, manifest, "A123456789")
 // console.log(application)
@@ -70,7 +65,7 @@ const fulfillment = await buildAndSignFulfillment(
   attestation, // attestation
    "IdCredential", // credential type
   {
-    // credentialSchema: getCredentialSchemaAsVCObject(getAttestionDefinition(KYCAML_ATTESTATION)),
+    // credentialSchema: getCredentialSchemaAsVCObject(getAttestionDefinition(ID_ATTESTATION)),
     credentialSchema: {
       id: "https://verite.id/definitions/schemas/0.0.1/IdAttestation",
       type: "IdCredential",

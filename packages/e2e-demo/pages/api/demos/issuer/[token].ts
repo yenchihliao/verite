@@ -59,7 +59,7 @@ export default apiHandler<EncodedCredentialFulfillment>(async (req, res) => {
   const manifestId = getManifestIdFromCredentialApplication(
     credentialApplication
   )
-  const manifest = await findManifestById(manifestId)
+  const manifest = await findManifestById("IdAttestation")
   await validateCredentialApplication(credentialApplication, manifest)
 
   // Build a revocation list and index if needed. We currently only need
@@ -73,24 +73,31 @@ export default apiHandler<EncodedCredentialFulfillment>(async (req, res) => {
       ? new Date(Date.now() + oneMinute)
       : new Date(Date.now() + twoMonths)
 
-  const userAttestation = buildAttestationForUser(user, manifest)
-  const attestationDefinition = getAttestionDefinition(userAttestation.type)
 
-  // Generate new credentials for the user
+  const attestation = {
+    type: "IdAttestation",
+    process: "https://verite.id/definitions/processes/id/0.0.1/usa",
+    approvalDate: new Date().toISOString()
+  }
   const fulfillment = await buildAndSignFulfillment(
     buildIssuer(process.env.ISSUER_DID, process.env.ISSUER_SECRET),
     credentialApplication.holder,
     manifest,
-    userAttestation,
-    attestationToCredentialType(userAttestation.type),
+    attestation,
+    "IdCredential",
     {
-      credentialSchema: getCredentialSchemaAsVCObject(attestationDefinition),
-      credentialStatus: revocationList,
-      expirationDate
+      credentialSchema: {
+        id: "https://verite.id/definitions/schemas/0.0.1/IdAttestation",
+        type: "IdCredential"
+      },
+      credentialStatus: {
+        id: "http://example.com/revocation-list#42",
+        type: "RevocationList2021Status",
+        statusListIndex: "42",
+        statusListCredential: "http://example.com/revocation-list"
+      }
     }
   )
-
-
 
   // Save the credentials to the database
   await persistGeneratedCredentials(user, fulfillment)

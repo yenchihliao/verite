@@ -16,6 +16,14 @@ const items = [
     icon: UsersIcon
   },
   {
+    name: "Id Attestation",
+    description:
+      "Proof that your account has been verified and passed Id checks",
+    href: "/demos/issuer/pid",
+    iconColor: "bg-pink-500",
+    icon: UsersIcon
+  },
+  {
     name: "Credit Score",
     description: "Proof of your current credit score",
     href: "/demos/issuer/credit-score",

@@ -6,8 +6,8 @@ import type { CredentialManifest } from "verite"
 
 export const MANIFEST_MAP: Record<string, CredentialManifest> = {
   "credit-score": creditScoreManifest,
-  kyc: kycManifest,
-  "PID": idManifest
+  "kyc": kycManifest,
+  "pid": idManifest
 }
 
 export const MANIFESTS: CredentialManifest[] = Object.values(MANIFEST_MAP)

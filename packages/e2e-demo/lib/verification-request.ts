@@ -4,6 +4,7 @@ import {
   challengeTokenUrlWrapper,
   buildCreditScoreVerificationOffer,
   buildKycVerificationOffer,
+  buildIdVerificationOffer,
   VerificationOffer
 } from "verite"
 
@@ -56,6 +57,14 @@ export async function createVerificationOffer(
       fullURL(`/api/demos/verifier/${id}/callback`),
       [process.env.ISSUER_DID],
       /* minimumCreditScore: */ 600
+    )
+  } else if (type === "pid"){
+    verificationRequest = buildIdVerificationOffer(
+      id,
+      process.env.VERIFIER_DID,
+      replyUrl,
+      fullURL(`/api/demos/verifier/${id}/callback`),
+      [process.env.ISSUER_DID]
     )
   } else {
     throw new NotFoundError()

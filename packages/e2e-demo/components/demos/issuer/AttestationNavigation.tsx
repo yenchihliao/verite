@@ -10,6 +10,7 @@ type Props = {
 
 const tabs = [
   { name: "KYC/AML", href: "/demos/issuer/kyc" },
+  { name: "PID", href: "/demos/issuer/pid" },
   { name: "Credit Score", href: "/demos/issuer/credit-score" }
 ]
 

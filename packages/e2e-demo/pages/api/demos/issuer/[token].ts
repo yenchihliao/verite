@@ -13,6 +13,7 @@ import {
   getManifestIdFromCredentialApplication,
   requiresRevocableCredentials,
   validateCredentialApplication,
+  validateIdCredentialApplication,
   CREDIT_SCORE_MANIFEST_ID,
   getCredentialSchemaAsVCObject,
   getAttestionDefinition
@@ -60,7 +61,7 @@ export default apiHandler<EncodedCredentialFulfillment>(async (req, res) => {
     credentialApplication
   )
   const manifest = await findManifestById("IdAttestation")
-  await validateCredentialApplication(credentialApplication, manifest)
+  await validateIdCredentialApplication(credentialApplication, manifest)
 
   // Build a revocation list and index if needed. We currently only need
   // a revocable credential for KYC/AML credentials.

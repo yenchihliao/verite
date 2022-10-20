@@ -8,6 +8,7 @@ import {
   buildPresentationSubmission,
   validateVerificationSubmission,
   validateCredentialApplication,
+  validateIdCredentialApplication,
   decodeVerifiableCredential,
   decodeVerifiablePresentation,
   getCredentialSchemaAsVCObject,
@@ -39,14 +40,15 @@ if(conti) {
 }
 
 //  The credential application is created and returned as a JWT
-const encodedApplication = await buildIdCredentialApplication(clientDidKey, manifest, "A123456789")
+const encodedApplication = await buildIdCredentialApplication(clientDidKey, manifest, "A123456781")
 // console.log(application)
 
 //  The decoded JWT is necessary when it comes time to issue the verifiable presentation which will include this credential
 const application = await decodeVerifiablePresentation(encodedApplication)
 var conti = prompt()('application: ')
 if(conti) console.log(util.inspect(application, false, null))
-await validateCredentialApplication(application, manifest)
+// await validateCredentialApplication(application, manifest)
+await validateIdCredentialApplication(application, manifest)
 
 //  The issuer is created from the issuer key, and the credential is issued
 var conti = prompt()('issuer: ')

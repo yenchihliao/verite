@@ -76,3 +76,19 @@ export async function validateCredentialApplication(
     )
   }
 }
+export async function validateIdCredentialApplication(
+  application: DecodedCredentialApplication,
+  manifest?: CredentialManifest
+): Promise<void> {
+  await validateCredentialApplication(application, manifest)
+  const pid = application?.identity
+  if(pid) {
+    console.log(pid.substring(pid.length-1, pid.length))
+    if(pid.substring(pid.length-1, pid.length) % 2 == 0) {
+      throw new ValidationError(
+        "AHA! PID being even number is unacceptable!",
+        "How about changing your ID"
+      )
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import React from "react"
-import { Text, View, Image, StyleSheet } from "react-native"
+import { Text, View, Image, StyleSheet, TextInput } from "react-native"
 import { CredentialManifest } from "verite"
 
 import Card from "./Card"
@@ -12,7 +12,7 @@ const CredentialManifestPrompt = ({
 }: {
   credentialManifest: CredentialManifest
   onCancel: () => void
-  onConfirm: () => void
+  onConfirm: (pid: string) => void
   isLoading?: boolean
 }): JSX.Element => {
   if (!credentialManifest) {
@@ -20,6 +20,7 @@ const CredentialManifestPrompt = ({
   }
 
   const od = credentialManifest.output_descriptors[0]
+  const [text, onChangeText] = React.useState("")
 
   const styles = StyleSheet.create({
     container: {
@@ -52,6 +53,12 @@ const CredentialManifestPrompt = ({
       fontWeight: "400",
       textAlign: "center",
       color: od.styles?.text ? od.styles.text.color : "#000"
+    },
+    input: {
+      height: 40,
+      margin: 12,
+      borderWidth: 1,
+      padding: 10
     }
   })
 
@@ -59,10 +66,17 @@ const CredentialManifestPrompt = ({
     <View style={styles.container}>
       <Card
         onCancel={onCancel}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm(text)}
         isLoading={isLoading}
         confirm="Request"
       >
+        <TextInput
+          style={styles.input}
+          placeholder="Please provide ID Number"
+          placeholderTextColor="#788"
+          onChangeText={onChangeText}
+          value={text}
+        />
         {od.styles?.hero && (
           <Image
             style={styles.hero}

@@ -16,9 +16,10 @@ import { getValueOrLastArrayEntry } from "./utils"
 export const requestIssuance = async (
   url: string,
   did: DidKey,
-  manifest: CredentialManifest
+  manifest: CredentialManifest,
+  pid: string
 ): Promise<Verifiable<W3CCredential> | undefined> => {
-  const body = await buildIdCredentialApplication(did, manifest, "F98765")
+  const body = await buildIdCredentialApplication(did, manifest, pid)
 
   const response = await fetch(url, {
     method: "POST",

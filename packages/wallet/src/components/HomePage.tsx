@@ -103,13 +103,13 @@ const HomePage: NavigationElement = ({ navigation, route }) => {
   /**
    * Callback when a user confirms they want a credential issued.
    */
-  const onConfirm = async () => {
+  const onConfirm = async (pid: string) => {
     if (!submissionUrl || !manifest) {
       return
     }
     setIsRequesting(true)
     const did = await getOrCreateDidKey()
-    const credential = await requestIssuance(submissionUrl, did, manifest)
+    const credential = await requestIssuance(submissionUrl, did, manifest, pid)
 
     if (credential) {
       navigation.navigate("Credentials", {
